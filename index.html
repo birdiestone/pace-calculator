@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Löphastighetsräknare</title>
+
     <style>
       :root {
         --bg: #0b0f19;
@@ -20,178 +21,163 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
         color: var(--text);
-        background: radial-gradient(1200px 600px at 20% 10%, rgba(120, 100, 255, 0.25), transparent 55%),
-                    radial-gradient(900px 500px at 80% 20%, rgba(0, 200, 255, 0.18), transparent 60%),
-                    radial-gradient(900px 700px at 50% 90%, rgba(0, 255, 170, 0.12), transparent 65%),
-                    var(--bg);
+        background:
+          radial-gradient(1200px 600px at 20% 10%, rgba(120, 100, 255, 0.25), transparent 55%),
+          radial-gradient(900px 500px at 80% 20%, rgba(0, 200, 255, 0.18), transparent 60%),
+          radial-gradient(900px 700px at 50% 90%, rgba(0, 255, 170, 0.12), transparent 65%),
+          var(--bg);
         display: grid;
         place-items: center;
         padding: 24px;
       }
 
-      .wrap { width: min(920px, 100%); }
+      .wrap { width: min(880px, 100%); }
 
       header {
         display: flex;
-        gap: 14px;
-        align-items: flex-start;
         justify-content: space-between;
-        margin-bottom: 16px;
+        gap: 12px;
+        margin-bottom: 14px;
       }
 
       h1 {
-        font-size: clamp(22px, 3.2vw, 34px);
-        line-height: 1.1;
         margin: 0;
-        letter-spacing: -0.02em;
+        font-size: clamp(22px, 3vw, 32px);
       }
 
       .sub {
-        margin: 8px 0 0;
-        color: var(--muted);
+        margin: 6px 0 0;
         font-size: 14px;
+        color: var(--muted);
       }
 
       .pill {
-        display: inline-flex;
-        gap: 8px;
-        align-items: center;
-        padding: 10px 12px;
+        padding: 8px 12px;
         border: 1px solid var(--line);
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--muted);
         font-size: 13px;
-        white-space: nowrap;
+        color: var(--muted);
+        background: rgba(255,255,255,0.04);
         height: fit-content;
-      }
-
-      .grid {
-        display: grid;
-        gap: 14px;
-        grid-template-columns: repeat(12, 1fr);
       }
 
       .card {
         border: 1px solid var(--line);
         background: var(--card);
-        border-radius: 18px;
-        padding: 16px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 14px;
       }
 
       .card h3 {
-        margin: 0 0 10px;
-        font-size: 15px;
-        letter-spacing: -0.01em;
+        margin: 0 0 4px;
+        font-size: 14px;
       }
 
       .hint {
-        margin: 0 0 12px;
-        color: var(--muted);
+        margin: 0 0 10px;
         font-size: 13px;
+        color: var(--muted);
       }
 
       label {
-        display: block;
-        color: var(--muted);
         font-size: 12px;
-        margin: 10px 0 6px;
+        color: var(--muted);
+        margin-bottom: 4px;
+        display: block;
       }
 
       input {
         width: 100%;
-        padding: 12px 12px;
-        border-radius: 12px;
+        padding: 10px;
+        border-radius: 10px;
         border: 1px solid var(--line);
-        background: rgba(0, 0, 0, 0.18);
+        background: rgba(0,0,0,0.18);
         color: var(--text);
-        outline: none;
         font-size: 15px;
       }
 
       input:focus {
+        outline: none;
         border-color: var(--focus);
-        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+      }
+
+      .inputsRow {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
       }
 
       .actions {
         display: flex;
         gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 12px;
+        margin-top: 10px;
       }
 
       button {
-        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 10px;
         border: 1px solid var(--line);
         background: var(--card2);
         color: var(--text);
-        padding: 10px 12px;
-        border-radius: 12px;
         font-weight: 600;
+        cursor: pointer;
       }
 
-      button:hover { filter: brightness(1.08); }
+      .resultGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
 
-      .result { grid-column: span 12; display: grid; gap: 12px; grid-template-columns: 1fr; }
-
-      .resultBox {
+      .metric {
         border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 18px;
-        padding: 16px;
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
       }
 
-      .resultTop {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        gap: 12px;
-        margin-bottom: 8px;
+      .metric h4 {
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: var(--muted);
       }
 
-      .resultTitle { margin: 0; font-size: 14px; color: var(--muted); }
-      .status { font-size: 12px; color: var(--muted); }
-
-      .big { font-size: clamp(20px, 3.2vw, 30px); margin: 0; letter-spacing: -0.02em; }
-      .smallLine { margin-top: 8px; color: var(--muted); font-size: 13px; }
-
-      .two { display: grid; gap: 12px; grid-template-columns: repeat(2, 1fr); }
+      .big {
+        font-size: 22px;
+        font-variant-numeric: tabular-nums;
+      }
 
       .list {
-        margin-top: 12px;
         display: grid;
-        gap: 8px;
+        gap: 6px;
       }
 
       .listRow {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 12px;
-        padding: 10px 12px;
+        padding: 8px 10px;
         border: 1px solid var(--line);
-        border-radius: 14px;
+        border-radius: 12px;
         background: rgba(255,255,255,0.04);
-      }
-
-      .mono {
+        font-size: 14px;
         font-variant-numeric: tabular-nums;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       }
 
-      .span4 { grid-column: span 4; }
-      .span12 { grid-column: span 12; }
+      .status {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
 
-      @media (max-width: 840px) {
-        .span4 { grid-column: span 12; }
-        .two { grid-template-columns: 1fr; }
-        header { flex-direction: column; align-items: flex-start; }
-        .pill { white-space: normal; }
+      @media (max-width: 820px) {
+        header { flex-direction: column; }
+        .inputsRow { grid-template-columns: 1fr; }
+        .resultGrid { grid-template-columns: 1fr; }
       }
     </style>
   </head>
@@ -201,86 +187,60 @@
       <header>
         <div>
           <h1>Löphastighetsräknare 🏃‍♂️</h1>
-          <p class="sub">
-            Fyll i <b>två</b> av fälten (<b>tempo</b>, <b>distans</b>, <b>tid</b>) så räknas det tredje ut automatiskt.
-          </p>
+          <p class="sub">Fyll i två fält så räknas det tredje automatiskt.</p>
         </div>
-        <div class="pill">✨ Auto • Tempo: <b>mm:ss</b> • Tid: <b>mm:ss</b> / <b>hh:mm:ss</b></div>
+        <div class="pill">Tempo mm:ss • Tid mm:ss / hh:mm:ss</div>
       </header>
 
-      <div class="grid">
-        <div class="card span4">
-          <h3>Tempo (min/km)</h3>
-          <p class="hint">Ex: <b>5:30</b> (mm:ss)</p>
+      <!-- INPUT -->
+      <div class="card">
+        <h3>Inmatning</h3>
+        <p class="hint">Tempo, distans och tid – valfri ordning</p>
 
-          <label for="pace">Tempo</label>
-          <input id="pace" inputmode="text" placeholder="t.ex. 5:30" />
-        </div>
-
-        <div class="card span4">
-          <h3>Distans (km)</h3>
-          <p class="hint">Ex: <b>10</b> eller <b>21.0975</b></p>
-
-          <label for="distance">Distans</label>
-          <input id="distance" inputmode="decimal" placeholder="t.ex. 10" />
-        </div>
-
-        <div class="card span4">
-          <h3>Tid</h3>
-          <p class="hint">Ex: <b>42:30</b> (mm:ss) eller <b>1:35:00</b> (hh:mm:ss)</p>
-
-          <label for="time">Tid</label>
-          <input id="time" inputmode="text" placeholder="t.ex. 50:00" />
-
-          <div class="actions">
-            <button id="clearBtn" type="button">Rensa</button>
-            <button id="demoBtn" type="button">Demo (10 km + 50:00)</button>
+        <div class="inputsRow">
+          <div>
+            <label for="pace">Tempo (min/km)</label>
+            <input id="pace" placeholder="5:30" />
+          </div>
+          <div>
+            <label for="distance">Distans (km)</label>
+            <input id="distance" placeholder="10" />
+          </div>
+          <div>
+            <label for="time">Tid</label>
+            <input id="time" placeholder="50:00" />
           </div>
         </div>
 
-        <div class="result span12">
-          <div class="resultBox">
-            <div class="resultTop">
-              <p class="resultTitle">Output</p>
-              <span class="status" id="status">Fyll i två fält för att börja ✍️</span>
-            </div>
+        <div class="actions">
+          <button id="clearBtn">Rensa</button>
+          <button id="demoBtn">Demo</button>
+        </div>
+      </div>
 
-            <div class="two">
-              <div class="card" style="margin:0;">
-                <h3 style="margin:0 0 8px;">Km/h</h3>
-                <p class="big mono" id="outSpeed">—</p>
-                <div class="smallLine">hastighet</div>
-              </div>
+      <!-- OUTPUT -->
+      <div class="card">
+        <h3>Resultat</h3>
 
-              <div class="card" style="margin:0;">
-                <h3 style="margin:0 0 8px;">Beräknat tempo</h3>
-                <p class="big mono" id="outPace">—</p>
-                <div class="smallLine">min/km</div>
-              </div>
-            </div>
-
-            <div class="list" aria-label="Sluttider">
-              <div class="listRow">
-                <b>5 km</b>
-                <span class="mono" id="t5k">—</span>
-              </div>
-              <div class="listRow">
-                <b>10 km</b>
-                <span class="mono" id="t10k">—</span>
-              </div>
-              <div class="listRow">
-                <b>Halvmarathon (21.0975 km)</b>
-                <span class="mono" id="thm">—</span>
-              </div>
-              <div class="listRow">
-                <b>Marathon (42.195 km)</b>
-                <span class="mono" id="tm">—</span>
-              </div>
-            </div>
-
-            <p class="smallLine" id="outExtra">—</p>
+        <div class="resultGrid">
+          <div class="metric">
+            <h4>Hastighet</h4>
+            <div class="big" id="outSpeed">—</div>
+          </div>
+          <div class="metric">
+            <h4>Tempo</h4>
+            <div class="big" id="outPace">—</div>
           </div>
         </div>
+
+        <div class="list">
+          <div class="listRow"><span>5 km</span><span id="t5k">—</span></div>
+          <div class="listRow"><span>10 km</span><span id="t10k">—</span></div>
+          <div class="listRow"><span>Halvmarathon</span><span id="thm">—</span></div>
+          <div class="listRow"><span>Marathon</span><span id="tm">—</span></div>
+        </div>
+
+        <div class="status" id="status">Fyll i två fält för att börja</div>
       </div>
     </div>
 
