@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Löphastighetsräknare</title>
+    <style>
+      :root {
+        --bg: #0b0f19;
+        --card: rgba(255, 255, 255, 0.06);
+        --card2: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.65);
+        --line: rgba(255, 255, 255, 0.12);
+        --focus: rgba(255, 255, 255, 0.18);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+        color: var(--text);
+        background: radial-gradient(1200px 600px at 20% 10%, rgba(120, 100, 255, 0.25), transparent 55%),
+                    radial-gradient(900px 500px at 80% 20%, rgba(0, 200, 255, 0.18), transparent 60%),
+                    radial-gradient(900px 700px at 50% 90%, rgba(0, 255, 170, 0.12), transparent 65%),
+                    var(--bg);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .wrap {
+        width: min(920px, 100%);
+      }
+
+      header {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-size: clamp(22px, 3.2vw, 34px);
+        line-height: 1.1;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .sub {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .pill {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 13px;
+        white-space: nowrap;
+        height: fit-content;
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(12, 1fr);
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        background: var(--card);
+        border-radius: 18px;
+        padding: 16px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+
+      .hint {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      label {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin: 10px 0 6px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--text);
+        outline: none;
+        font-size: 15px;
+      }
+
+      input:focus {
+        border-color: var(--focus);
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08);
+      }
+
+      .row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--card2);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+
+      button:hover {
+        filter: brightness(1.08);
+      }
+
+      .result {
+        grid-column: span 12;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+
+      .resultBox {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .resultTop {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .resultTitle {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .status {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .big {
+        font-size: clamp(20px, 3.2vw, 30px);
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .smallLine {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .two {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .span4 { grid-column: span 4; }
+      .span8 { grid-column: span 8; }
+      .span12 { grid-column: span 12; }
+
+      @media (max-width: 840px) {
+        .span4, .span8 { grid-column: span 12; }
+        .row { grid-template-columns: 1fr; }
+        .two { grid-template-columns: 1fr; }
+        header { flex-direction: column; align-items: flex-start; }
+        .pill { white-space: normal; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Löphastighetsräknare 🏃‍♂️</h1>
+          <p class="sub">
+            Skriv in <b>min/km</b> eller <b>km/h</b> eller <b>distans + tid</b>.
+            Räknar automatiskt och fyller i resten.
+          </p>
+        </div>
+        <div class="pill">✨ Auto-beräkning • Pace: <b>5:30</b> eller <b>5.30</b></div>
+      </header>
+
+      <div class="grid">
+        <div class="card span4">
+          <h3>Minuter per km</h3>
+          <p class="hint">Ex: <b>5:30</b> eller <b>5.30</b></p>
+
+          <label for="pace">Pace</label>
+          <input id="pace" inputmode="text" placeholder="t.ex. 5:30" />
+        </div>
+
+        <div class="card span4">
+          <h3>Km/h</h3>
+          <p class="hint">Ex: <b>12</b> eller <b>12.5</b></p>
+
+          <label for="speed">Hastighet</label>
+          <input id="speed" inputmode="decimal" placeholder="t.ex. 12" />
+        </div>
+
+        <div class="card span4">
+          <h3>Distans + tid</h3>
+          <p class="hint">Tid i minuter (kan vara decimal).</p>
+
+          <div class="row">
+            <div>
+              <label for="distance">Distans (km)</label>
+              <input id="distance" inputmode="decimal" placeholder="t.ex. 10" />
+            </div>
+            <div>
+              <label for="time">Tid (min)</label>
+              <input id="time" inputmode="decimal" placeholder="t.ex. 50" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="clearBtn" type="button">Rensa</button>
+            <button id="demoBtn" type="button">Demo (10 km / 50 min)</button>
+          </div>
+        </div>
+
+        <div class="result span12">
+          <div class="resultBox">
+            <div class="resultTop">
+              <p class="resultTitle">Resultat</p>
+              <span class="status" id="status">Skriv något för att börja ✍️</span>
+            </div>
+
+            <div class="two">
+              <div class="card" style="margin:0;">
+                <h3 style="margin:0 0 8px;">Pace</h3>
+                <p class="big" id="outPace">—</p>
+                <div class="smallLine" id="outPaceSmall">min/km</div>
+              </div>
+
+              <div class="card" style="margin:0;">
+                <h3 style="margin:0 0 8px;">Hastighet</h3>
+                <p class="big" id="outSpeed">—</p>
+                <div class="smallLine" id="outSpeedSmall">km/h</div>
+              </div>
+            </div>
+
+            <p class="smallLine" id="outExtra">—</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const els = {
+        pace: document.getElementById("pace"),
+        speed: document.getElementById("speed"),
+        distance: document.getElementById("distance"),
+        time: document.getElementById("time"),
+        status: document.getElementById("status"),
+        outPace: document.getElementById("outPace"),
+        outSpeed: document.getElementById("outSpeed"),
+        outExtra: document.getElementById("outExtra"),
+        clearBtn: document.getElementById("clearBtn"),
+        demoBtn: document.getElementById("demoBtn"),
+      };
+
+      // För att inte trigga auto-beräkning som “källa” när vi fyller i fält programmässigt
+      let isFilling = false;
+
+      function setStatus(msg) {
+        els.status.textContent = msg;
+      }
+
+      function formatPace(minutesPerKm) {
+        if (!isFinite(minutesPerKm) || minutesPerKm <= 0) return null;
+        const min = Math.floor(minutesPerKm);
+        let sec = Math.round((minutesPerKm - min) * 60);
+        // hantera typ 4:59.999 -> 5:00
+        let minAdj = min;
+        if (sec === 60) { sec = 0; minAdj += 1; }
+        return `${minAdj}:${String(sec).padStart(2, "0")}`;
+      }
+
+      function parsePace(text) {
+        // accepterar "5:30" eller "5.30" (där . betyder sekunder)
+        const t = String(text || "").trim();
+        if (!t) return null;
+
+        if (t.includes(":")) {
+          const [m, s] = t.split(":");
+          const min = Number(m);
+          const sec = Number(s);
+          if (!isFinite(min) || !isFinite(sec) || min < 0 || sec < 0 || sec >= 60) return null;
+          return min + sec / 60;
+        }
+
+        if (t.includes(".")) {
+          const [m, s] = t.split(".");
+          const min = Number(m);
+          const sec = Number(s);
+          if (!isFinite(min) || !isFinite(sec) || min < 0 || sec < 0 || sec >= 60) return null;
+          return min + sec / 60;
+        }
+
+        // om någon skriver bara minuter "5" tolkar vi som 5:00
+        const minOnly = Number(t.replace(",", "."));
+        if (!isFinite(minOnly) || minOnly <= 0) return null;
+        return minOnly;
+      }
+
+      function parseNumber(text) {
+        const t = String(text || "").trim().replace(",", ".");
+        if (!t) return null;
+        const n = Number(t);
+        if (!isFinite(n) || n <= 0) return null;
+        return n;
+      }
+
+      function render(paceMinPerKm, speedKmh, distanceKm, timeMin, sourceLabel) {
+        const paceStr = formatPace(paceMinPerKm);
+        const speedStr = isFinite(speedKmh) && speedKmh > 0 ? speedKmh.toFixed(1) : null;
+
+        els.outPace.textContent = paceStr ? `${paceStr} min/km` : "—";
+        els.outSpeed.textContent = speedStr ? `${speedStr} km/h` : "—";
+
+        if (distanceKm && timeMin) {
+          const h = timeMin / 60;
+          els.outExtra.textContent = `Utifrån ${distanceKm} km på ${timeMin} min (≈ ${(h).toFixed(2)} h).`;
+        } else {
+          els.outExtra.textContent = "—";
+        }
+
+        setStatus(sourceLabel || "Klart ✅");
+      }
+
+      function clearOutputs() {
+        els.outPace.textContent = "—";
+        els.outSpeed.textContent = "—";
+        els.outExtra.textContent = "—";
+      }
+
+      function clearAll() {
+        isFilling = true;
+        els.pace.value = "";
+        els.speed.value = "";
+        els.distance.value = "";
+        els.time.value = "";
+        isFilling = false;
+        clearOutputs();
+        setStatus("Rensat. Skriv något för att börja ✍️");
+      }
+
+      function fillFromPace() {
+        const pace = parsePace(els.pace.value);
+        if (!pace) {
+          clearOutputs();
+          setStatus("Skriv pace som 5:30 eller 5.30");
+          return;
+        }
+        const speed = 60 / pace;
+
+        isFilling = true;
+        els.speed.value = speed.toFixed(1);
+        // distans/tid lämnas orört (du kan fylla om du vill)
+        isFilling = false;
+
+        render(pace, speed, parseNumber(els.distance.value), parseNumber(els.time.value), "Källa: min/km");
+      }
+
+      function fillFromSpeed() {
+        const speed = parseNumber(els.speed.value);
+        if (!speed) {
+          clearOutputs();
+          setStatus("Skriv en hastighet (km/h), t.ex. 12");
+          return;
+        }
+        const pace = 60 / speed;
+
+        isFilling = true;
+        els.pace.value = formatPace(pace);
+        isFilling = false;
+
+        render(pace, speed, parseNumber(els.distance.value), parseNumber(els.time.value), "Källa: km/h");
+      }
+
+      function fillFromDistanceTime() {
+        const d = parseNumber(els.distance.value);
+        const t = parseNumber(els.time.value);
+        if (!d || !t) {
+          clearOutputs();
+          setStatus("Fyll i distans + tid (min) för att räkna");
+          return;
+        }
+
+        const speed = d / (t / 60);
+        const pace = t / d;
+
+        isFilling = true;
+        els.speed.value = speed.toFixed(1);
+        els.pace.value = formatPace(pace);
+        isFilling = false;
+
+        render(pace, speed, d, t, "Källa: distans + tid");
+      }
+
+      function decideAndCompute(changedEl) {
+        if (isFilling) return;
+
+        // Prioritet: det fält du nyss ändrade blir “källan”
+        if (changedEl === els.pace) return fillFromPace();
+        if (changedEl === els.speed) return fillFromSpeed();
+        if (changedEl === els.distance || changedEl === els.time) return fillFromDistanceTime();
+
+        // fallback
+        setStatus("Skriv något för att börja ✍️");
+      }
+
+      // Auto-beräkna vid input
+      [els.pace, els.speed, els.distance, els.time].forEach((el) => {
+        el.addEventListener("input", () => decideAndCompute(el));
+      });
+
+      // Knappar
+      els.clearBtn.addEventListener("click", clearAll);
+      els.demoBtn.addEventListener("click", () => {
+        isFilling = true;
+        els.distance.value = "10";
+        els.time.value = "50";
+        isFilling = false;
+        fillFromDistanceTime();
+      });
+
+      // Startläge
+      clearOutputs();
+      setStatus("Skriv något för att börja ✍️");
+    </script>
+  </body>
+</html>
